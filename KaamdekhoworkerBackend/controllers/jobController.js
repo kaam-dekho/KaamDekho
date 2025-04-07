@@ -5,6 +5,7 @@ export const postJob = async (req, res) => {
     const job = await createJob(req.body);
     res.json(job);
   } catch (err) {
+    console.error('Post job error:', err.message);
     res.status(500).json({ error: 'Error posting job' });
   }
 };
@@ -26,6 +27,7 @@ export const acceptJob = async (req, res) => {
     const updated = await acceptJobByWorker(jobId, worker_id);
     res.json(updated);
   } catch (err) {
+    console.error('Accept job error:', err.message);
     res.status(500).json({ error: 'Error accepting job' });
   }
 };
