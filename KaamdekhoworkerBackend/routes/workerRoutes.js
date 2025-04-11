@@ -1,10 +1,12 @@
-import express from 'express';
-import { updateWorkerProfile, getWalletBalance, getJobHistory } from '../controllers/workerController.js';
-
+const express = require('express');
 const router = express.Router();
+const { createWorker, getWorker, loginWorker, registerWorker, updateWorkerProfile, getWorkerById } = require('../controllers/workerController');
 
-router.put('/:id', updateWorkerProfile);
-router.get('/:id/wallet', getWalletBalance);
-router.get('/:id/job-history', getJobHistory);
+router.post('/workers', createWorker);
+router.get('/workers/:phone', getWorker);
+router.post('/login', loginWorker);
+router.post('/profile', registerWorker);
+router.put('/profile/:id', updateWorkerProfile);
+router.get('/profile/:id', getWorkerById);
 
-export default router;
+module.exports = router;

@@ -1,10 +1,9 @@
-import express from 'express';
-import { postJob, getJobs, acceptJob } from '../controllers/jobController.js';
-
+const express = require('express');
 const router = express.Router();
+const { postJob, acceptJob, getJobsByCity } = require('../controllers/jobController');
 
-router.post('/', postJob);
-router.get('/', getJobs);
-router.post('/:id/accept', acceptJob);
+router.post('/jobs', postJob);
+router.post('/jobs/accept', acceptJob);
+router.get('/jobs/:city', getJobsByCity);
 
-export default router;
+module.exports = router;

@@ -1,33 +1,42 @@
-import { createJob, getJobsByFilter, acceptJobByWorker } from '../models/jobModel.js';
+const supabase = require('../supabase/supabaseClient');
 
-export const postJob = async (req, res) => {
-  try {
-    const job = await createJob(req.body);
-    res.json(job);
-  } catch (err) {
-    console.error('Post job error:', err.message);
-    res.status(500).json({ error: 'Error posting job' });
-  }
+exports.postJob = async (req, res) => {
+  const { user_phone, title, description,address, media_url, budget, worker_type, city } = req.body;
+
+  const { data, error } = await supabase
+    .from('jobs')
+    .insert([{ user_phone, title, description, address, media_url, budget, worker_type, city }])
+    .select();
+
+
+  if (error) return res.status(400).json({ error: error.message });
+
+  res.status(201).json(data[0]);
 };
 
-export const getJobs = async (req, res) => {
-  try {
-    const { city, worker_type } = req.query;
-    const jobs = await getJobsByFilter(city, worker_type);
-    res.json(jobs);
-  } catch (err) {
-    res.status(500).json({ error: 'Error fetching jobs' });
-  }
+exports.acceptJob = async (req, res) => {
+  const { job_id, worker_phone } = req.body;
+
+  const { data, error } = await supabase
+    .from('jobs')
+    .update({ accepted_by: worker_phone })
+    .eq('id', job_id);
+
+  if (error) return res.status(400).json({ error: error.message });
+
+  res.status(200).json({ message: 'Job accepted', data });
 };
 
-export const acceptJob = async (req, res) => {
-  try {
-    const { worker_id } = req.body;
-    const jobId = req.params.id;
-    const updated = await acceptJobByWorker(jobId, worker_id);
-    res.json(updated);
-  } catch (err) {
-    console.error('Accept job error:', err.message);
-    res.status(500).json({ error: 'Error accepting job' });
-  }
+exports.getJobsByCity = async (req, res) => {
+  const { city } = req.params;
+
+  const { data, error } = await supabase
+    .from('jobs')
+    .select('*')
+    .eq('city', city)
+    .is('accepted_by', null);
+
+  if (error) return res.status(400).json({ error: error.message });
+
+  res.status(200).json(data);
 };
